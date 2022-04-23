@@ -1,11 +1,8 @@
-HELP.md
 .gradle
-build
-target
-bin
+build/
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**
-!**/src/test/**
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 ### STS ###
 .apt_generated
@@ -15,15 +12,18 @@ bin
 .settings
 .springBeans
 .sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-.idea/*
-!.idea/saveactions_settings.xml
-!.idea/codeStyles
+.idea
 *.iws
 *.iml
 *.ipr
 out/
+!**/src/main/**/out/
+!**/src/test/**/out/
 
 ### NetBeans ###
 /nbproject/private/
@@ -34,9 +34,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-### Mac ###
-.DS_Store
-
-### DB ###
-/.docker/db/mysql_data
