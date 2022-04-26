@@ -1,34 +1,36 @@
 package com.example.plugins
 
-import io.ktor.server.auth.*
-import io.ktor.util.*
-import io.ktor.server.auth.jwt.*
+import io.ktor.auth.*
+import io.ktor.auth.jwt.*
 import com.auth0.jwt.JWT
-import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.example.adaptor.presentation.model.AuthUser
 import com.typesafe.config.ConfigFactory
-import io.ktor.server.application.*
-import io.ktor.server.config.*
-import io.ktor.server.response.*
-import io.ktor.server.request.*
+import io.ktor.application.*
+import io.ktor.config.*
 
 fun Application.configureSecurity() {
-    val config = HoconApplicationConfig(ConfigFactory.load())
-    authentication {
-            jwt {
-                val jwtAudience = config.property("jwt.audience").getString()
-                realm = config.property("jwt.realm").getString()
-                verifier(
-                    JWT
-                        .require(Algorithm.HMAC256("secret"))
-                        .withAudience(jwtAudience)
-                        .withIssuer(config.property("jwt.domain").getString())
-                        .build()
-                )
-                validate { credential ->
-                    if (credential.payload.audience.contains(jwtAudience)) JWTPrincipal(credential.payload) else null
-                }
-            }
-        }
+    val config = HoconApplicationConfig(ConfigFactory.load("application.conf"))
 
+    authentication {
+        jwt {
+            val jwtAudience = config.property("jwt.audience").getString()
+            realm = config.property("jwt.realm").getString()
+            verifier(
+                JWT
+                    .require(Algorithm.HMAC256("secret"))
+                    .withAudience(jwtAudience)
+                    .withIssuer(config.property("jwt.issuer").getString())
+                    .build()
+            )
+            validate { credential ->
+                credential.payload.getClaim("userId").let { claim ->
+                    if (!claim.isNull) {
+                        AuthUser(claim.asInt())
+                    } else {
+                        null
+                    }
+            }}
+        }
+    }
 }
